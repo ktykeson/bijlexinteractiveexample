@@ -1,0 +1,137 @@
+.App {
+  display: flex;
+  justify-content: center;
+  gap: 2vh;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+}
+
+.graph_box {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.equation_display {
+  background-color: rgba(255, 255, 255, 0.8);
+  /* Slightly transparent white background */
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  /* Adjust the size to your preference */
+  color: #333;
+  text-align: center;
+  /* Dark text color for readability */
+}
+
+button {
+  margin: 5px;
+  padding: 10px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:focus {
+  outline: none;
+}
+
+.line_graph {
+  width: 80% !important;
+}
+
+.arrow_box {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+#up_arrow {
+  transform: rotate(270deg);
+  -webkit-transform: rotate(270deg);
+  -moz-transform: rotate(270deg);
+  -ms-transform: rotate(270deg);
+  -o-transform: rotate(270deg);
+}
+
+#down_arrow {
+  transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+}
+
+#left_arrow {
+  transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+}
+
+#right_arrow {
+  transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+}
+
+#up_arrow {
+  transform: rotate(270deg);
+  -webkit-transform: rotate(270deg);
+  -moz-transform: rotate(270deg);
+  -ms-transform: rotate(270deg);
+  -o-transform: rotate(270deg);
+}
+
+.target_equation {
+  background-color: rgba(32, 32, 32, 0.8);
+  padding: 20px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.submit_button {
+  width: 100%;
+  background-color: green;
+}
+
+.dialog_box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+  background-color: #333;
+  border-radius: 20px;
+  width: 20vw;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -ms-border-radius: 20px;
+  -o-border-radius: 20px;
+}
+
+.dialog_message {
+  color: white;
+  font-weight: 100;
+}
+
+.dialog_confirmation {
+  background-color: green;
+}

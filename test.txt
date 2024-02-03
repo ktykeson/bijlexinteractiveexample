@@ -1,0 +1,128 @@
+import React, { useState } from 'react';
+import { Line } from 'react-chartjs-2';
+import 'chart.js/auto';
+
+// Constants for rotation
+const ROTATION_INCREMENT = 0.5; // radians
+const graphRange = 10;
+
+function App() {
+  const [lineParams, setLineParams] = useState({ m: 1, b: 0 });
+
+  const moveLine = (direction) => {
+    setLineParams((prevParams) => {
+      let { m, b } = prevParams;
+      switch (direction) {
+        case 'up':
+          b += 1;
+          break;
+        case 'down':
+          b -= 1;
+          break;
+        case 'left':
+          m -= 0.1;
+          break;
+        case 'right':
+          m += 0.1;
+          break;
+        default:
+          break;
+      }
+      return { ...prevParams, m, b };
+    });
+  };
+
+  const rotateLine = () => {
+    setLineParams((prevParams) => ({
+      ...prevParams,
+      rotation: prevParams.rotation + ROTATION_INCREMENT
+    }));
+  };
+
+  // Prepare data for the chart
+  const data = {
+    labels: Array.from({ length: graphRange * 2 + 1 }, (_, i) => i - graphRange),
+    datasets: [
+      {
+        label: 'Line',
+        data: Array.from({ length: graphRange * 2 + 1 }, (_, i) => lineParams.m * (i - graphRange) + lineParams.b),
+        borderColor: 'purple',
+        borderWidth: 2,
+      },
+    ],
+  };
+
+  // Prepare options for the chart to include rotation
+  const options = {
+    scales: {
+      y: {
+        type: 'linear',
+        position: 'center',
+        min: -graphRange,
+        max: graphRange,
+        grid: {
+          display: true,
+          drawBorder: true,
+          drawOnChartArea: true,
+          drawTicks: true,
+        },
+        ticks: {
+          stepSize: 1
+        }
+      },
+      x: {
+        type: 'linear',
+        position: 'center',
+        min: -graphRange,
+        max: graphRange,
+        grid: {
+          display: true,
+          drawBorder: true,
+          drawOnChartArea: true,
+          drawTicks: true,
+        },
+        ticks: {
+          stepSize: 1
+        }
+      }
+    },
+    elements: {
+      point: {
+        radius: 0 // Hide points
+      },
+      line: {
+        tension: 0 // Straight lines
+      }
+    },
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        enabled: false
+      },
+      datalabels: {
+        display: false
+      },
+    },
+    rotation: lineParams.rotation, // Apply rotation to the chart
+  };
+
+  return (
+    <div className="App">
+      <div className="graph-container">
+        <Line data={data} options={options} />
+      </div>
+      <div className="button-container">
+        <button onClick={() => moveLine('up')} className="up-button">Up</button>
+        <button onClick={() => moveLine('down')} className="down-button">Down</button>
+        <button onClick={() => moveLine('left')} className="left-button">Left</button>
+        <button onClick={() => moveLine('right')} className="right-button">Right</button>
+        <button onClick={rotateLine} className="rotate-button">Rotate</button>
+      </div>
+    </div>
+  );
+}
+
+export default App;
