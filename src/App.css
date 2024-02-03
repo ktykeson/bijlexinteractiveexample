@@ -6,6 +6,7 @@
   flex-direction: column;
   height: 100vh;
   width: 100vw;
+  background-color: #181A1B;
 }
 
 .graph_box {
@@ -13,6 +14,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: #181A1B;
 }
 
 .equation_display {
