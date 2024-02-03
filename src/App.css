@@ -32,7 +32,7 @@
 button {
   margin: 5px;
   padding: 10px;
-  background-color: red;
+  background-color: rgb(39, 39, 39) !important;
   color: white;
   border: none;
   border-radius: 5px;
@@ -94,16 +94,22 @@ button:focus {
   -o-transform: rotate(270deg);
 }
 
+.question_container {
+  color: white;
+}
+
 .target_equation {
   background-color: rgba(32, 32, 32, 0.8);
   padding: 20px;
   text-align: center;
   font-weight: bold;
+  color: white;
 }
 
 .submit_button {
   width: 100%;
-  background-color: green;
+  color: white;
+  background-color: green !important;
 }
 
 .dialog_box {
@@ -135,5 +141,5 @@ button:focus {
 }
 
 .dialog_confirmation {
-  background-color: green;
+  background-color: green !important;
 }
