@@ -57,7 +57,7 @@ const Match = () => {
 
       setMessage('Verbind de vergelijkingen met de grafieken hieronder.');
     } else {
-      alert('Geen vergelijkingen opgeslagen');
+      alert('No Saved Equations Found.');
       navigate('/');
     }
   }, [contextEquations, navigate]);
