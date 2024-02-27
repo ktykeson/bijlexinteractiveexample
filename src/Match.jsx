@@ -55,7 +55,7 @@ const Match = () => {
       setEquations(formattedEquations);
       setShuffledEquations(shuffleArray([...formattedEquations]));
 
-      setMessage('Vergelijk de vergelijkingen met de grafieken hieronder.');
+      setMessage('Verbind de vergelijkingen met de grafieken hieronder.');
     } else {
       alert('Geen vergelijkingen opgeslagen');
       navigate('/');
