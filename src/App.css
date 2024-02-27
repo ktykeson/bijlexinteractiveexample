@@ -1,145 +1,115 @@
-.App {
-  display: flex;
-  justify-content: center;
-  gap: 2vh;
-  align-items: center;
-  flex-direction: column;
-  height: 100vh;
-  width: 100vw;
-  background-color: #ffffff;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* Ensures padding does not affect the total width or height of an element */
 }
 
-.graph_box {
-  width: 100vw;
+/* Ensure the entire page has a white background */
+body, html {
+  margin: 0;
+  padding: 0;
+  background-color: #fff; /* Set background to white */
+  color: #000; /* Ensure text is black for contrast */
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #ffffff;
 }
 
-.equation_display {
-  background-color: rgba(0, 0, 0, 0.8);
-  /* Slightly transparent white background */
-  padding: 10px;
-  border-radius: 5px;
-  font-size: 1.2rem;
-  /* Adjust the size to your preference */
-  color: #333;
-  text-align: center;
-  /* Dark text color for readability */
+.matching-exercise {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  justify-content: center;
+  align-items: center;
+  text-align: center; /* Center text */
+  width: 100%; /* Take up full width to center content horizontally */
+  min-height: 100vh; /* Ensures it covers the full viewport height at minimum */
+  padding: 20px; /* Adds padding around the entire matching-exercise container */
+}
+
+.content {
+  margin-bottom: 60px; /* Increased space below the content before the buttons */
+  /* Additional spacing between the title and the paragraph if needed */
+  h1 {
+    margin-bottom: 20px; /* Space below the title */
+  }
+  p {
+    margin-bottom: 20px; /* Space below the paragraph, before buttons if there's no other content */
+  }
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row; /* Align buttons in a row */
+  justify-content: center;
+  gap: 20px; /* Space between buttons */
 }
 
 button {
-  margin: 5px;
-  padding: 10px;
-  background-color: rgb(29, 119, 255) !important;
-  color: white;
-  border: none;
-  border-radius: 5px;
+  padding: 10px 20px; /* Button padding for better visuals */
+  cursor: pointer;
+  /* You can add further button styling here */
+}
+
+.enter-equation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.equation-input-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 50px;
+}
+
+.equation-input {
+  width: 75%; /* Adjust based on preference */
+  height: 200px; /* Adjust based on preference */
+  margin-right: 20px;
+}
+
+.save-button {
+  width: 20%; /* Adjust based on preference */
+  height: 40px; /* Adjust for better ergonomics */
   cursor: pointer;
 }
 
-button:focus {
-  outline: none;
-}
-
-.line_graph {
-  width: 80% !important;
-}
-
-.arrow_box {
+/* Styles for the equation input container */
+.equation-input-container {
   display: flex;
-  justify-content: center;
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
-
-#up_arrow {
-  transform: rotate(270deg);
-  -webkit-transform: rotate(270deg);
-  -moz-transform: rotate(270deg);
-  -ms-transform: rotate(270deg);
-  -o-transform: rotate(270deg);
-}
-
-#down_arrow {
-  transform: rotate(180deg);
-  -webkit-transform: rotate(180deg);
-  -moz-transform: rotate(180deg);
-  -ms-transform: rotate(180deg);
-  -o-transform: rotate(180deg);
-}
-
-#left_arrow {
-  transform: rotate(180deg);
-  -webkit-transform: rotate(180deg);
-  -moz-transform: rotate(180deg);
-  -ms-transform: rotate(180deg);
-  -o-transform: rotate(180deg);
-}
-
-#right_arrow {
-  transform: rotate(180deg);
-  -webkit-transform: rotate(180deg);
-  -moz-transform: rotate(180deg);
-  -ms-transform: rotate(180deg);
-  -o-transform: rotate(180deg);
-}
-
-#up_arrow {
-  transform: rotate(270deg);
-  -webkit-transform: rotate(270deg);
-  -moz-transform: rotate(270deg);
-  -ms-transform: rotate(270deg);
-  -o-transform: rotate(270deg);
-}
-
-.question_container {
-  color: white;
-}
-
-.target_equation {
-  background-color: rgba(32, 32, 32, 0.8);
-  padding: 20px;
-  text-align: center;
-  font-weight: bold;
-  color: white;
-}
-
-.submit_button {
-  width: 100%;
-  color: white;
-  background-color: green !important;
-}
-
-.dialog_box {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  -webkit-transform: translate(-50%, -50%);
-  -moz-transform: translate(-50%, -50%);
-  -ms-transform: translate(-50%, -50%);
-  -o-transform: translate(-50%, -50%);
-  background-color: #333;
-  border-radius: 20px;
-  width: 20vw;
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
-  -webkit-border-radius: 20px;
-  -moz-border-radius: 20px;
-  -ms-border-radius: 20px;
-  -o-border-radius: 20px;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
 }
 
-.dialog_message {
+/* Styles for both buttons to make them look similar */
+.button-style {
+  background-color: #4CAF50; /* Example color, adjust as needed */
+  border: none;
   color: white;
-  font-weight: 100;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
 }
 
-.dialog_confirmation {
-  background-color: green !important;
+/* Styles for the textarea */
+.equation-input {
+  width: 300px; /* Adjust width as needed */
+  height: 150px; /* Adjust height as needed */
+  margin-bottom: 20px; /* Creates space between the textarea and the buttons */
+}
+
+/* Optional: Styles for the div that wraps the buttons, if needed */
+.buttons-container {
+  display: flex;
+  gap: 10px;
 }

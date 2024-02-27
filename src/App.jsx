@@ -1,197 +1,104 @@
-import { useState } from "react";
-import { Scatter } from "react-chartjs-2";
-import "chart.js/auto";
-import 'chartjs-plugin-datalabels';
-import "./App.css";
-import Popup from "./Popup";
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import './App.css';
+import Match from './Match.jsx'; // Adjust the path as necessary based on your file structure
+import { EquationsProvider } from './EquationsContext.jsx';
+import { useEquations } from './EquationsContext.jsx';
 
-// Constants for graph range
-const graphRange = 10;
+function EnterEquations() {
+  const navigate = useNavigate();
+  const { equations, setEquations } = useEquations();
 
-function App() {
-    const [dots, setDots] = useState([]);
-    const [lines, setLines] = useState([]);
-    const [placeDotsActive, setPlaceDotsActive] = useState(false);
-    const [drawLineActive, setDrawLineActive] = useState(false);
-    const [selectedDotsForLine, setSelectedDotsForLine] = useState([]);
-    const [showPopup, setShowPopup] = useState(false);
-    const [popupMessage, setPopupMessage] = useState("");
+  const [equation, setEquation] = useState('');
 
-    // Prepare data for the chart, including separate datasets for each line
-    const data = {
-        labels: Array.from({ length: graphRange * 2 + 1 }, (_, i) => i - graphRange),
-        datasets: [
-            {
-                label: "Dots",
-                data: dots,
-                backgroundColor: "black",
-                pointRadius: 5,
-            },
-            ...lines.map((line, index) => ({
-                label: `Line ${index}`,
-                data: [line[0], line[1]], // Use the two dots as the data for the line
-                type: 'line',
-                fill: false,
-                borderColor: "red",
-                borderWidth: 2,
-                showLine: true,
-                lineTension: 0, // Straight lines
-                pointRadius: 0, // Hide the points for the line dataset
-            })),
-        ],
-    };
+  useEffect(() => {
+    if (equations && equations.length > 0) {
+      setEquation(equations.join('\n'));
+    }
+  }, [equations]);
 
-    // Options remain unchanged
-    const options = {
-        scales: {
-            y: {
-                type: "linear",
-                position: "center",
-                min: -graphRange,
-                max: graphRange,
-                grid: {
-                    color: "rgba(0, 60, 150, 0.3)",
-                    borderColor: "rgba(255, 255, 255, 0.25)",
-                    display: true,
-                    drawBorder: true,
-                    drawOnChartArea: true,
-                    drawTicks: true,
-                },
-                ticks: {
-                    stepSize: 1,
-                },
-            },
-            x: {
-                type: "linear",
-                position: "center",
-                min: -graphRange,
-                max: graphRange,
-                grid: {
-                    color: "rgba(0, 60, 150, 0.3)",
-                    borderColor: "rgba(0, 60, 150, 0.25)",
-                    display: true,
-                    drawBorder: true,
-                    drawOnChartArea: true,
-                    drawTicks: true,
-                },
-                ticks: {
-                    stepSize: 1,
-                },
-            },
-        },
-        plugins: {
-            datalabels: {
-                color: 'black',
-                align: 'top',
-                anchor: 'end',
-                formatter: (value, context) => {
-                    const dot = context.chart.data.datasets[0].data[context.dataIndex];
-                    return `(${dot.x}, ${dot.y})`;
-                },
-                font: {
-                    weight: 'bold',
-                    size: 10,
-                },
-                offset: 5,
-            },
-            legend: {
-                display: false,
-            },
-            tooltip: {
-                enabled: false,
-            },
-        },
-        onClick: (e) => {
-            if (!placeDotsActive && !drawLineActive) return;
+  const handleSave = () => {
+    const equationsArray = equation.split('\n').filter(eq => eq.trim() !== '');
+    setEquations(equationsArray);
+    alert('Equations saved: ' + equationsArray.join(', '));
+  };
 
-            const canvasPosition = e.chart.canvas.getBoundingClientRect();
-            const x = Math.round(e.chart.scales.x.getValueForPixel(e.native.x - canvasPosition.x));
-            const y = Math.round(e.chart.scales.y.getValueForPixel(e.native.y - canvasPosition.y));
-            
-            if (placeDotsActive) {
-                // Existing logic for placing dots remains unchanged
-                const clickThreshold = 0.5;
-                const existingIndex = dots.findIndex(dot => 
-                    Math.abs(dot.x - x) <= clickThreshold && 
-                    Math.abs(dot.y - y) <= clickThreshold
-                );
+  // Function to generate a single random equation
+  const generateRandomEquation = () => {
+    const m = Math.floor(Math.random() * 21) - 10; // Random integer from -10 to 10
+    const b = Math.floor(Math.random() * 21) - 10; // Random integer from -10 to 10
+    // Determine the sign of b for correct equation formatting
+    const sign = b < 0 ? "-" : "+";
 
-                if (existingIndex >= 0) {
-                    // Logic for removing a dot and its connected lines remains unchanged
-                    const filteredLines = lines.filter(line => 
-                        !(line[0].x === dots[existingIndex].x && line[0].y === dots[existingIndex].y) &&
-                        !(line[1].x === dots[existingIndex].x && line[1].y === dots[existingIndex].y)
-                    );
-                    setLines(filteredLines);
-                    setDots(dots.filter((_, index) => index !== existingIndex));
-                } else {
-                    setDots([...dots, { x, y }]);
-                }
-            } else if (drawLineActive) {
-                // Logic for drawing lines is updated to create separate datasets for each line
-                const clickThreshold = 0.5;
-                const clickedDotIndex = dots.findIndex(dot =>
-                    Math.abs(dot.x - x) <= clickThreshold &&
-                    Math.abs(dot.y - y) <= clickThreshold
-                );
+    return `y=${m}x${sign}${Math.abs(b)}`;
+  };
 
-                if (clickedDotIndex >= 0 && selectedDotsForLine.length < 2) {
-                    const newSelectedDot = dots[clickedDotIndex];
-                    if (selectedDotsForLine.some(dot => dot === newSelectedDot)) {
-                        return;
-                    }
+  // Function to append four new random equations to the textarea
+  const handleGenerateEquations = () => {
+    const newEquations = Array.from({ length: 4 }, generateRandomEquation).join('\n');
+    setEquation(equation => equation + (equation ? '\n' : '') + newEquations);
+  };
 
-                    const newSelectedDots = [...selectedDotsForLine, newSelectedDot];
-                    setSelectedDotsForLine(newSelectedDots);
-
-                    if (newSelectedDots.length === 2) {
-                        if (!lines.find(line => 
-                            (line[0] === newSelectedDots[0] && line[1] === newSelectedDots[1]) || 
-                            (line[0] === newSelectedDots[1] && line[1] === newSelectedDots[0]))) {
-                            setLines([...lines, newSelectedDots]);
-                        }
-                        setSelectedDotsForLine([]);
-                    }
-                }
-            }
-        },
-        maintainAspectRatio: true,
-    };
-
-    // Functions for toggling modes remain unchanged
-    const togglePlaceDots = () => {
-        setPlaceDotsActive(!placeDotsActive);
-        setDrawLineActive(false);
-        setSelectedDotsForLine([]);
-    };
-
-    const toggleDrawLine = () => {
-        setDrawLineActive(!drawLineActive);
-        setPlaceDotsActive(false);
-        setSelectedDotsForLine([]);
-    };
-
-    return (
-        <div className="App">
-            {showPopup && <Popup message={popupMessage} confirm={() => setShowPopup(false)} />}
-            <div className="graph_box">
-                <div className="line_graph" style={{ width: "50%" }}>
-                    <Scatter data={data} options={options} />
-                </div>
-                <div style={{ width: "20%" }}>
-                    <div className="arrow_box">
-                        <button onClick={togglePlaceDots} type="button">
-                            {placeDotsActive ? "Placing Dots..." : "Place Dots"}
-                        </button>
-                        <br />
-                        <button onClick={toggleDrawLine} type="button" style={{marginTop: "10px"}}>
-                            {drawLineActive ? "Drawing Line..." : "Draw Line"}
-                        </button>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div>
+      <h1>Enter Equations Page</h1>
+      <div className="equation-input-container">
+        <textarea
+          value={equation}
+          onChange={(e) => setEquation(e.target.value)}
+          placeholder="Type your equations here, one per line..."
+          className="equation-input"
+        ></textarea>
+        <div className="buttons-container">
+          <button onClick={handleSave} className="button-style">Save</button>
+          <button onClick={handleGenerateEquations} className="button-style">Generate Equations</button>
+          <button onClick={() => navigate(-1)} className="button-style">Go Back</button>
         </div>
-    );
+      </div>
+    </div>
+  );
+}
+
+// Your MatchingExercise Component adjusted with navigation
+function MatchingExercise() {
+  const location = useLocation();
+  const navigate = useNavigate(); // Make sure this is inside the component
+  
+  useEffect(() => {
+    // Immediately redirect and reset the retry state if it's true
+    if (location.state?.retry) {
+      // Perform necessary actions before resetting retry, if any
+      navigate('/match', { replace: true }); // Use replace to avoid navigation history with retry state
+    }
+  }, [location, navigate]);
+
+  return (
+    <div className="matching-exercise">
+      <div className="content">
+        <h1>Matching Exercise</h1>
+        <p>by Tyke, Mustafa, and Ralu</p>
+        <div className="buttons">
+        <button onClick={() => navigate('/enter-equations')}>Enter Equations</button>
+        <button onClick={() => navigate('/match')}>Go to Exercise</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Your App Component with Routing
+function App() {
+  return (
+    <EquationsProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<MatchingExercise />} />
+          <Route path="/enter-equations" element={<EnterEquations />} />
+          <Route path="/match" element={<Match />} />
+        </Routes>
+      </BrowserRouter>
+    </EquationsProvider>
+  );
 }
 
 export default App;
