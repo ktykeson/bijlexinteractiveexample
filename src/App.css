@@ -113,3 +113,9 @@ button {
   display: flex;
   gap: 10px;
 }
+
+@media (max-width: 768px) {
+  .graph-container {
+      width: 100%; /* Make each graph take the full width on smaller screens */
+  }
+}
