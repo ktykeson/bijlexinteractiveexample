@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
+import { Chart, registerables } from 'chart.js';
 import { Line } from "react-chartjs-2";
 import "chart.js/auto";
 import { useNavigate } from 'react-router-dom';
 import { useEquations } from './EquationsContext';
+
+Chart.register(...registerables);
 
 const shuffleArray = (array) => {
   for (let i = array.length - 1; i > 0; i--) {
@@ -27,34 +30,39 @@ const Match = () => {
 
   const colors = ["red", "blue", "orange", "green"];
 
-  const generateRandomEquations = () => {
-    let newEquations = [];
-    for (let i = 0; i < 4; i++) {
-      const m = Math.round(Math.random() * 10 - 5);
-      const b = Math.round(Math.random() * 20 - 10);
-      newEquations.push({ m, b, id: i });
-    }
-    setEquations(newEquations);
-    setShuffledEquations(shuffleArray([...newEquations]));
-  };
-
   useEffect(() => {
     if (contextEquations.length > 0) {
-      // Shuffle contextEquations if there are more than 4, then take the first 4
-      const shuffledEquations = shuffleArray([...contextEquations]); // Copy to avoid mutating the original array
+      const shuffledEquations = shuffleArray([...contextEquations]);
       const selectedEquations = shuffledEquations.length > 4 ? shuffledEquations.slice(0, 4) : shuffledEquations;
   
-      // Convert them to your expected format here before setting them
       const formattedEquations = selectedEquations.map((eq, index) => {
-        const parts = eq.replace('y=', '').split('x');
-        const m = parseFloat(parts[0]);
-        const b = parseFloat(parts[1]);
-        return { m, b, id: index };
-      });
+        const parts = eq.split('=');
+        if (parts.length !== 2) return null; // Basic validation to ensure equation format is correct
+        const variable = parts[0].trim();
+        const expression = parts[1].trim();
+        const match = expression.match(/([-+]?[0-9]*\.?[0-9]+)([a-zA-Z])+([-+]?[0-9]+)/);
+        const quadraticMatch = expression.match(/([-+]?[0-9]*\.?[0-9]+)\((\w)([-+][0-9]+)\)\^2\s*([-+]?[0-9]+)/);
+      
+        if (quadraticMatch) {
+          const a = parseFloat(quadraticMatch[1]);
+          const quadvariable = quadraticMatch[2];
+          const dependentVariable = parts[0].trim()[0];
+          const h = parseFloat(quadraticMatch[3]);
+          const k = parseFloat(quadraticMatch[4]);
+          return { a, h, k, id: index, quadvariable, dependentVariable, type: 'quadratic' };
+        }
+        else if (match) {
+          const m = parseFloat(match[1]);
+          const dependentVariable = match[2];
+          const b = parseFloat(match[3]);
+          return { m, b, id: index, variable, dependentVariable };
+        }
+        return null; // Handle invalid equation formats if needed
+      }).filter(eq => eq !== null); // Remove any nulls that were added due to invalid formats
   
       setEquations(formattedEquations);
       setShuffledEquations(shuffleArray([...formattedEquations]));
-
+  
       setMessage('Verbind de vergelijkingen met de grafieken hieronder.');
     } else {
       alert('No Saved Equations Found.');
@@ -136,65 +144,143 @@ const Match = () => {
 
   const renderGraph = (equation, index) => {
     const borderColor = selectedColors[index] !== null ? colors[selectedColors[index] % colors.length] : "rgba(75,192,192,1)";
-    const data = {
-      labels: Array.from({ length: 21 }, (_, i) => i - 10),
-      datasets: [
-        {
-          label: `Line ${index + 1}`,
-          data: Array.from({ length: 21 }, (_, i) => equation.m * (i - 10) + equation.b),
-          borderColor,
-          borderWidth: 2,
-        },
-      ],
-    };
 
-    const options = {
-      scales: {
-        y: {
-          min: -10,
-          max: 10,
-        },
-        x: {
-          min: -10,
-          max: 10,
-        },
-      },
-      onClick: () => handleGraphClick(index),
-    };
+    let data, options;
 
-    return <Line data={data} options={options} />;
-  };
+    if (equation.type === 'quadratic') {
+        data = {
+            labels: Array.from({ length: 41 }, (_, i) => i - 20),
+            datasets: [{
+                label: `Parabola: ${index + 1}`,
+                data: Array.from({ length: 41 }, (_, i) => {
+                    let x = i - 20;
+                    return equation.a * Math.pow(x - equation.h, 2) + equation.k;
+                }),
+                borderColor,
+                borderWidth: 2,
+            }],
+        };
+  
+        options = {
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    suggestedMin: -10,
+                    suggestedMax: 10,
+                    grid: {
+                        color: (context) => context.tick.value === 0 ? 'black' : 'rgba(0, 0, 0, 0.1)',
+                        lineWidth: (context) => context.tick.value === 0 ? 2 : 1,
+                    },
+                    ticks: {
+                        color: 'black',
+                    },
+                },
+                x: {
+                    min: -20,
+                    max: 20,
+                    grid: {
+                        color: (context) => context.tick.value === (20) ? 'black' : 'rgba(0, 0, 0, 0.1)',
+                        lineWidth: (context) => context.tick.value === (20) ? 2 : 1,
+                    },
+                    ticks: {
+                        color: 'black',
+                        // Include a stepSize or use 'autoSkip: false' to ensure a tick at zero is included.
+                        // Adjust stepSize or autoSkip as necessary based on your data.
+                    },
+                },
+            },
+            onClick: () => handleGraphClick(index),
+        };
+    } else {
+        data = {
+            labels: Array.from({ length: 21 }, (_, i) => i - 10),
+            datasets: [{
+                label: `Line ${index + 1}`,
+                data: Array.from({ length: 21 }, (_, i) => equation.m * (i - 10) + equation.b),
+                borderColor,
+                borderWidth: 2,
+            }],
+        };
+  
+        options = {
+            scales: {
+                y: {
+                    min: -10,
+                    max: 10,
+                    grid: {
+                        color: (context) => context.tick.value === 0 ? 'black' : 'rgba(0, 0, 0, 0.1)',
+                        lineWidth: (context) => context.tick.value === 0 ? 2 : 1,
+                    },
+                    ticks: {
+                        color: 'black',
+                    },
+                },
+                x: {
+                    min: -10,
+                    max: 10,
+                    grid: {
+                      color: (context) => context.tick.value === (10) ? 'black' : 'rgba(0, 0, 0, 0.1)',
+                      lineWidth: (context) => context.tick.value === (10) ? 2 : 1,
+                    },
+                    ticks: {
+                        color: 'black',
+                        // Include a stepSize or use 'autoSkip: false' to ensure a tick at zero is included.
+                        // Adjust stepSize or autoSkip as necessary based on your data.
+                    },
+                },
+            },
+            onClick: () => handleGraphClick(index),
+        };
+    }
 
-  return (
-    <div>
+    return (
+        <div style={{ width: '700px', height: '300px' }}> {/* Adjust the size as needed */}
+            <Line data={data} options={options} />
+        </div>
+    );
+};
+
+
+
+return (
+  <div>
       {message && <div style={{ textAlign: "center", fontSize: "20px", fontWeight: "bold", marginBottom: "20px" }}>{message}</div>}
-      <div style={{ display: "flex", justifyContent: "center", gap: "20px" }}>
-        {equations.map((equation, index) => (
-          <div key={index}>{renderGraph(equation, index)}</div>
-        ))}
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "20px" }}>
+          {equations.map((equation, index) => (
+              <div key={index} style={{ width: 'calc(50% - 20px)', display: 'flex', justifyContent: 'center', marginBottom: "20px" }}>
+                  {renderGraph(equation, index)}
+              </div>
+          ))}
       </div>
-      <div style={{ marginTop: "20px", display: "flex", justifyContent: "center", gap: "20px" }}>
-        {shuffledEquations.map((equation, index) => {
-          // Determine the sign and format the equation string accordingly
-          const sign = equation.b < 0 ? "-" : "+";
-          return (
-            <button
-              key={index}
-              style={{ background: highlightedButtons[index] ? colors[index % colors.length] : "" }}
-              onClick={() => selectEquationForMatching(index)}
-            >
-              {/* Updated to include correct sign logic */}
-              y = {equation.m}x {sign} {Math.abs(equation.b)}
-            </button>
-          );
-        })}
+      <div style={{ display: "flex", justifyContent: "center", gap: "10px", flexWrap: "wrap" }}> {/* Reduced gap to make buttons closer */}
+          {shuffledEquations.map((equation, index) => {
+              let equationText;
+              if (equation.type === 'quadratic') {
+                  const hDisplay = equation.h > 0 ? `+ ${equation.h}` : `- ${Math.abs(equation.h)}`;
+                  const kDisplay = equation.k >= 0 ? `+ ${equation.k}` : `${equation.k}`;
+                  equationText = `${equation.dependentVariable} = ${equation.a}(${equation.quadvariable} ${hDisplay})^2 ${kDisplay}`;
+              } else {
+                  const sign = equation.b < 0 ? "-" : "+";
+                  equationText = `${equation.variable} = ${equation.m}${equation.dependentVariable} ${sign} ${Math.abs(equation.b)}`;
+              }
+              return (
+                  <button
+                      key={index}
+                      style={{ background: highlightedButtons[index] ? colors[index % colors.length] : "", padding: "10px", display: "inline-block" }} // Adjust button styling here if needed
+                      onClick={() => selectEquationForMatching(index)}
+                  >
+                      {equationText}
+                  </button>
+              );
+          })}
       </div>
       <div style={{ display: "flex", justifyContent: "center", gap: "20px", marginTop: "20px" }}>
-        <button onClick={handleTryAgain} disabled={matches.includes(null)}>{buttonText}</button>
-        <button onClick={() => navigate(-1)}>Terug</button>
+          <button onClick={handleTryAgain} disabled={matches.includes(null)}>{buttonText}</button>
+          <button onClick={() => navigate(-1)}>Terug</button>
       </div>
-    </div>
-  );
+  </div>
+);
+
 };
 
 export default Match;

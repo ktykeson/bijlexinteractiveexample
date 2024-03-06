@@ -25,12 +25,26 @@ function EnterEquations() {
 
   // Function to generate a single random equation
   const generateRandomEquation = () => {
-    const m = Math.floor(Math.random() * 21) - 10; // Random integer from -10 to 10
-    const b = Math.floor(Math.random() * 21) - 10; // Random integer from -10 to 10
-    // Determine the sign of b for correct equation formatting
-    const sign = b < 0 ? "-" : "+";
-
-    return `y=${m}x${sign}${Math.abs(b)}`;
+    // Random choice between linear (1) and parabolic (2)
+    const equationType = Math.floor(Math.random() * 2) + 1;
+  
+    if (equationType === 1) { // Linear Equation
+      const m = Math.floor(Math.random() * 21) - 10; // Random integer from -10 to 10
+      const b = Math.floor(Math.random() * 21) - 10; // Random integer from -10 to 10
+      // Determine the sign of b for correct equation formatting
+      const sign = b < 0 ? "-" : "+";
+      return `y=${m}x${sign}${Math.abs(b)}`;
+    } else { // Parabolic Equation in Vertex Form
+      const a = Math.floor(Math.random() * 21) - 10; // Random integer from -10 to 10
+      const h = Math.floor(Math.random() * 21) - 10; // Random integer from -10 to 10
+      const k = Math.floor(Math.random() * 21) - 10; // Random integer from -10 to 10
+      // Ensure 'a' is not 0 for a valid parabola
+      if (a === 0) return "y=(x-0)^2"; // Fallback to a simple parabola if 'a' accidentally becomes 0
+      // Formatting for h and k inside the equation
+      const signH = h < 0 ? "+" : "-"; // Invert sign for correct formatting inside parentheses
+      const signK = k < 0 ? "-" : "+";
+      return `y=${a}(x${signH}${Math.abs(h)})^2${signK}${Math.abs(k)}`;
+    }
   };
 
   // Function to append four new random equations to the textarea
