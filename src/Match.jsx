@@ -158,6 +158,7 @@ const Match = () => {
                 }),
                 borderColor,
                 borderWidth: 2,
+                pointRadius: 0,
             }],
         };
   
@@ -199,14 +200,16 @@ const Match = () => {
                 data: Array.from({ length: 21 }, (_, i) => equation.m * (i - 10) + equation.b),
                 borderColor,
                 borderWidth: 2,
+                pointRadius: 0,
             }],
         };
   
         options = {
             scales: {
                 y: {
-                    min: -10,
-                    max: 10,
+                    beginAtZero: false,
+                    suggestedMin: -10,
+                    suggestedMax: 10,
                     grid: {
                         color: (context) => context.tick.value === 0 ? 'black' : 'rgba(0, 0, 0, 0.1)',
                         lineWidth: (context) => context.tick.value === 0 ? 2 : 1,
@@ -258,19 +261,25 @@ return (
               if (equation.type === 'quadratic') {
                   const hDisplay = equation.h > 0 ? `+ ${equation.h}` : `- ${Math.abs(equation.h)}`;
                   const kDisplay = equation.k >= 0 ? `+ ${equation.k}` : `${equation.k}`;
-                  equationText = `${equation.dependentVariable} = ${equation.a}(${equation.quadvariable} ${hDisplay})^2 ${kDisplay}`;
+                  equationText = (
+                      <span>
+                          {`${equation.dependentVariable} = ${equation.a}(${equation.quadvariable} ${hDisplay})`}
+                          <sup>2</sup>{`${kDisplay}`}
+                      </span>
+                  );
+                  //equationText = `${equation.dependentVariable} = ${equation.a}(${equation.quadvariable} ${hDisplay})^2 ${kDisplay}`;
               } else {
                   const sign = equation.b < 0 ? "-" : "+";
                   equationText = `${equation.variable} = ${equation.m}${equation.dependentVariable} ${sign} ${Math.abs(equation.b)}`;
               }
               return (
-                  <button
-                      key={index}
-                      style={{ background: highlightedButtons[index] ? colors[index % colors.length] : "", padding: "10px", display: "inline-block" }} // Adjust button styling here if needed
-                      onClick={() => selectEquationForMatching(index)}
-                  >
-                      {equationText}
-                  </button>
+                <button
+                    key={index}
+                    style={{ background: highlightedButtons[index] ? colors[index % colors.length] : "", padding: "10px", display: "inline-block" }} // Adjust button styling here if needed
+                    onClick={() => selectEquationForMatching(index)}
+                >
+                    {equationText}
+                </button>
               );
           })}
       </div>

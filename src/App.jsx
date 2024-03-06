@@ -39,7 +39,7 @@ function EnterEquations() {
       const h = Math.floor(Math.random() * 21) - 10; // Random integer from -10 to 10
       const k = Math.floor(Math.random() * 21) - 10; // Random integer from -10 to 10
       // Ensure 'a' is not 0 for a valid parabola
-      if (a === 0) return "y=(x-0)^2"; // Fallback to a simple parabola if 'a' accidentally becomes 0
+      if (a === 0) return "y=1(x-0)^2+1"; // Fallback to a simple parabola if 'a' accidentally becomes 0
       // Formatting for h and k inside the equation
       const signH = h < 0 ? "+" : "-"; // Invert sign for correct formatting inside parentheses
       const signK = k < 0 ? "-" : "+";
